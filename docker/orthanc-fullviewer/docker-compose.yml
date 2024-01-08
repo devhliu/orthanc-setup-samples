@@ -10,14 +10,14 @@ services:
       - 80:80
     depends_on:
       - orthanc
-      - ohif
+      # - ohif
       - meddream
 
   orthanc:
     image: devhliu/orthanc:24.1.0-full-allplugins
     build: orthanc
     restart: unless-stopped
-    ports: ["8042:8042"]
+    # ports: ["8042:8042"]
     volumes: ["orthanc-storage:/var/lib/orthanc/db"]
     environment:
       ORTHANC__NAME: "Orthanc"
@@ -30,7 +30,6 @@ services:
       ORTHANC__DICOM_WEB__PUBLIC_ROOT: "/orthanc/dicom-web/"
       VERBOSE_STARTUP: "true"      
       
-
       # postgresql storage using the orthanc-index service
       ORTHANC__POSTGRESQL: |
         {
@@ -53,18 +52,17 @@ services:
       OE2_ENABLED: "true"    
       ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__ENABLE_OPEN_IN_MED_DREAM_VIEWER: "true"
       ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__MED_DREAM_VIEWER_PUBLIC_ROOT: "http://localhost/meddream/"
-
   
   ohif:
     image: devhliu/orthanc-ohif-viewer:v3.8.0-beta.36
     build: ohif
+    # ports: [80:80]
     # optional if you want to customize the OHIF configuration:
     volumes:
       - ./ohif/default-app-config.js:/usr/share/nginx/html/app-config.js
     restart: unless-stopped
     depends_on:
       - orthanc
-    # ports: [80:80]
   
   meddream:
     image: devhliu/orthanc-meddream-viewer:8.3.1
@@ -75,7 +73,7 @@ services:
     depends_on:
       - orthanc
     environment:
-      integration: "study"
+      integration: "patient"
 
   orthanc-index:
     image: postgres:15

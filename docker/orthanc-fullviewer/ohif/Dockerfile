@@ -2,13 +2,15 @@
 
 FROM node:18.16.1-slim as builder
 
-RUN apt-get update && apt-get install -y git
+RUN apt-get update && apt-get install -y git 
 
 WORKDIR /sources
 RUN git clone https://github.com/OHIF/Viewers.git && cd /sources/Viewers && git checkout v3.8.0-beta.36
 
 WORKDIR /sources/Viewers
 
+# install using yarn mirror
+RUN yarn config set registry https://registry.npmmirror.com
 RUN yarn install --frozen-lockfile --verbose
 
 ENV QUICK_BUILD true
