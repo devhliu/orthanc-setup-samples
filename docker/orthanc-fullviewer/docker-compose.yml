@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    image: devhliu/orthanc-nginx:1.23-alpine
+    build: nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    depends_on:
+      - orthanc
+      - ohif
+      - meddream
+
+  orthanc:
+    image: devhliu/orthanc:24.1.0-full-allplugins
+    build: orthanc
+    restart: unless-stopped
+    ports: ["8042:8042"]
+    volumes: ["orthanc-storage:/var/lib/orthanc/db"]
+    environment:
+      ORTHANC__NAME: "Orthanc"
+      ORTHANC__REGISTERED_USERS: |
+        {
+          "demo": "demo",
+          "meddream": "R4Y8p7cG5cbos6"
+        }
+      ORTHANC__AUTHENTICATION_ENABLED: "false"
+      ORTHANC__DICOM_WEB__PUBLIC_ROOT: "/orthanc/dicom-web/"
+      VERBOSE_STARTUP: "true"      
+      
+
+      # postgresql storage using the orthanc-index service
+      ORTHANC__POSTGRESQL: |
+        {
+          "Host": "orthanc-index"
+        }
+
+      # serving 
+      ## ORTHANC__INDEXER__FOLDERS: |
+      ##   ["/dicom-files"]
+      
+      # various viewers
+      ## - stone web viewer
+      STONE_WEB_VIEWER_PLUGIN_ENABLED: "true"
+
+      # ohif viewer
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__ENABLE_OPEN_IN_OHIF_VIEWER_3: "true"
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__OHIF_VIEWER_3_PUBLIC_ROOT: "http://localhost/ohif/"
+
+      ## - meddream viewer
+      OE2_ENABLED: "true"    
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__ENABLE_OPEN_IN_MED_DREAM_VIEWER: "true"
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__MED_DREAM_VIEWER_PUBLIC_ROOT: "http://localhost/meddream/"
+
+  
+  ohif:
+    image: devhliu/orthanc-ohif-viewer:v3.8.0-beta.36
+    build: ohif
+    # optional if you want to customize the OHIF configuration:
+    volumes:
+      - ./ohif/default-app-config.js:/usr/share/nginx/html/app-config.js
+    restart: unless-stopped
+    depends_on:
+      - orthanc
+    # ports: [80:80]
+  
+  meddream:
+    image: devhliu/orthanc-meddream-viewer:8.3.1
+    build: meddream
+    restart: unless-stopped
+    user: root
+    # ports: ["8080:8080"]
+    depends_on:
+      - orthanc
+    environment:
+      integration: "study"
+
+  orthanc-index:
+    image: postgres:15
+    restart: unless-stopped
+    ports: ["5432:5432"]
+    volumes: ["orthanc-index:/var/lib/postgresql/data"]
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+
+volumes:
+
+  orthanc-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: /tmp/orthanc-data/db-storage
+      o: bind
+  
+  orthanc-index:
+    driver: local
+    driver_opts:
+      type: none
+      device: /tmp/orthanc-data/idx-storage
+      o: bind

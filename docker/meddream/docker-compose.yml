@@ -1,7 +1,9 @@
-version: "3"
+version: "3.8"
+
 services:
   
   orthanc:
+    image: osimis/orthanc:24.1.0-full-meddream
     build: orthanc
     restart: unless-stopped
     ports: ["8042:8042"]
@@ -18,7 +20,7 @@ services:
       ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__MED_DREAM_VIEWER_PUBLIC_ROOT: "http://localhost:8080/"
 
   meddream:
-    image: meddream/orthanc-dicom-viewer:7.9.0
+    image: meddream/orthanc-dicom-viewer:8.3.1
     restart: unless-stopped
     user: root
     ports: ["8080:8080"]
@@ -31,7 +33,10 @@ services:
       - ./meddream/system.json:/opt/meddream/sys/system.json
       - ./meddream/license:/opt/meddream/license
 
-
 volumes:
   orthanc-storage:
-
+    driver: local
+    driver_opts:
+      type: none
+      device: /tmp/orthanc
+      o: bind
