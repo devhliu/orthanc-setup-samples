@@ -1,5 +1,5 @@
 {
-  "Name": "ORTHANC",
+  "Name": "Orthanc",
   "DicomAet": "ORTHANC",
   
   "DicomModalities": {
@@ -13,7 +13,7 @@
   "RemoteAccessAllowed": true,
   "AuthenticationEnabled": true,
   "RegisteredUsers": {
-    "demo": "demo",
+    "admin": "admin",
     "meddream": "R4Y8p7cG5cbos6"
   },
 

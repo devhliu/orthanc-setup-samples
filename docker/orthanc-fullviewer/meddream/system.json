@@ -41,10 +41,10 @@
 	"blackListedSopClasses": [],
 	"forwardPacs": [
 		{
-			"storeScpIp": "127.0.0.1",
-			"storeScpPort": "104",
-			"storeScpAet": "PACS",
-			"description": "An example destination for Forward"
+			"storeScpIp": "localhost",
+			"storeScpPort": "11112",
+			"storeScpAet": "MERCURE",
+			"description": "send computing data"
 		}
 	],
 	"languages": [

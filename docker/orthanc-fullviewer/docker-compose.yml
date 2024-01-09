@@ -23,7 +23,7 @@ services:
       ORTHANC__NAME: "Orthanc"
       ORTHANC__REGISTERED_USERS: |
         {
-          "demo": "demo",
+          "admin": "admin",
           "meddream": "R4Y8p7cG5cbos6"
         }
       ORTHANC__AUTHENTICATION_ENABLED: "false"
@@ -31,6 +31,7 @@ services:
       VERBOSE_STARTUP: "true"      
       
       # postgresql storage using the orthanc-index service
+      POSTGRESQL_PLUGIN_ENABLED: "true"
       ORTHANC__POSTGRESQL: |
         {
           "Host": "orthanc-index"
@@ -45,14 +46,19 @@ services:
       STONE_WEB_VIEWER_PLUGIN_ENABLED: "true"
 
       # ohif viewer
+      # OHIF_PLUGIN_ENABLED: "true"
+      # /ohif/ has been built inside ohif docker image <PUBLIC_URL=/ohif/>
       ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__ENABLE_OPEN_IN_OHIF_VIEWER_3: "true"
-      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__OHIF_VIEWER_3_PUBLIC_ROOT: "http://localhost/ohif/"
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__OHIF_VIEWER_3_PUBLIC_ROOT: "/ohif/"
 
-      ## - meddream viewer
+      # - meddream viewer
       OE2_ENABLED: "true"    
       ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__ENABLE_OPEN_IN_MED_DREAM_VIEWER: "true"
-      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__MED_DREAM_VIEWER_PUBLIC_ROOT: "http://localhost/meddream/"
-  
+      ORTHANC__ORTHANC_EXPLORER_2__UI_OPTIONS__MED_DREAM_VIEWER_PUBLIC_ROOT: "/orthanc-meddream/"
+
+      # vol viewer
+      VOLVIEW_PLUGIN_ENABLED: "true"
+
   ohif:
     image: devhliu/orthanc-ohif-viewer:v3.8.0-beta.36
     build: ohif
@@ -73,7 +79,7 @@ services:
     depends_on:
       - orthanc
     environment:
-      integration: "patient"
+      integration: "study"
 
   orthanc-index:
     image: postgres:15
